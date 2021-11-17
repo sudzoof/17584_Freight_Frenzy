@@ -37,8 +37,8 @@ public class DriverControl extends LinearOpMode{
             leftDrive.setDirection(DcMotor.Direction.FORWARD);
             rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
-            leftDrive.setPower(leftPower()/1.5);
-            rightDrive.setPower(rightPower()/1.5);
+            leftDrive.setPower(leftPower());
+            rightDrive.setPower(rightPower());
 
             double liftPower = .55;
             if(liftDownValue()) liftPower = -liftPower;
@@ -48,11 +48,11 @@ public class DriverControl extends LinearOpMode{
     }
 
     private double leftPower(){
-        return gamepad1.left_stick_y;
+        return -gamepad1.left_stick_y/1.5;
     }
 
     private double rightPower(){
-        return gamepad1.right_stick_y/1.5;
+        return -gamepad1.right_stick_y/1.5;
     }
 
     private boolean liftUpValue(){
