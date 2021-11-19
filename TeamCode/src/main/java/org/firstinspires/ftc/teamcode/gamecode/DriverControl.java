@@ -22,7 +22,7 @@ public class DriverControl extends LinearOpMode{
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         lift = hardwareMap.get(DcMotor.class, "lift");
 
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -30,12 +30,6 @@ public class DriverControl extends LinearOpMode{
         waitForStart();
 
         while (opModeIsActive()){
-
-            telemetry.addData("Status", "Running");
-            telemetry.update();
-
-            leftDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
             leftDrive.setPower(leftPower());
             rightDrive.setPower(rightPower());
@@ -48,11 +42,11 @@ public class DriverControl extends LinearOpMode{
     }
 
     private double leftPower(){
-        return -gamepad1.left_stick_y/1.5;
+        return -gamepad1.left_stick_y;
     }
 
     private double rightPower(){
-        return -gamepad1.right_stick_y/1.5;
+        return -gamepad1.right_stick_y;
     }
 
     private boolean liftUpValue(){
