@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+/**
+ * A handler for Events
+ */
 public class EventHandler {
 
     private LinkedList<Event> readList;
@@ -11,16 +14,26 @@ public class EventHandler {
 
     private boolean wait;
 
+    /**
+     * Initializer
+     */
     public EventHandler(){
         readList = new LinkedList<>();
         activeEvents = new ArrayList<>();
         wait = false;
     }
 
+    /**
+     * Adds Events to the EventBuilder
+     * @param events The event(s) to add
+     */
     public void add(Event... events){
         readList.addAll(Arrays.asList(events));
     }
 
+    /**
+     * Updates the EventBuilder
+     */
     public void update(){
         while(!wait){
             Event e = readList.pop();
@@ -38,11 +51,11 @@ public class EventHandler {
         }
     }
 
-    public void setWait(boolean wait){
+    protected void setWait(boolean wait){
         this.wait = wait;
     }
 
-    public boolean getWait(){
+    protected boolean getWait(){
         return wait;
      }
 }
