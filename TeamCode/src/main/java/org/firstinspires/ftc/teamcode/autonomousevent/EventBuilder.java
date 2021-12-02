@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomousevent;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -38,7 +38,7 @@ public class EventBuilder {
      * @param power Amount to power by
      * @return EventBuilder for chaining
      */
-    public EventBuilder powerMotor(DcMotor motor, double power) {
+    public EventBuilder powerMotor(DcMotorSimple motor, double power) {
         toBuild = new Event() {
 
             @Override
@@ -71,7 +71,7 @@ public class EventBuilder {
      * @param power Amount to power by
      * @return EventBuilder for chaining
      */
-    public EventBuilder driveStraight(DcMotor leftDrive, DcMotor rightDrive, double power){
+    public EventBuilder driveStraight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
         toBuild = new Event() {
 
             @Override
@@ -106,7 +106,7 @@ public class EventBuilder {
      * @param power Amount to power by
      * @return EventBuilder for chaining
      */
-    public EventBuilder turnLeft(DcMotor leftDrive, DcMotor rightDrive, double power){
+    public EventBuilder turnLeft(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
         toBuild = new Event() {
 
             @Override
@@ -141,7 +141,7 @@ public class EventBuilder {
      * @param power Amount to power by
      * @return EventBuilder for chaining
      */
-    public EventBuilder turnRight(DcMotor leftDrive, DcMotor rightDrive, double power){
+    public EventBuilder turnRight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
         toBuild = new Event() {
 
             @Override
