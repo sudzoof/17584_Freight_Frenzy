@@ -170,6 +170,36 @@ public class EventBuilder {
     }
 
     /**
+     * Stops events until this event ends
+     * @param eventHandler The EventHandler to stop
+     * @return EventBuilder for chaining
+     */
+    public EventBuilder wait(EventHandler eventHandler){
+        toBuild = new Event() {
+            @Override
+            public void start() {
+                toBuild.start();
+            }
+
+            @Override
+            public void update() {
+                eventHandler.setWait(true);
+            }
+
+            @Override
+            public void end() {
+                eventHandler.setWait(false);
+            }
+
+            @Override
+            public boolean willEnd() {
+                return toBuild.willEnd();
+            }
+        };
+        return this;
+    }
+
+    /**
      * Ends the event after a set time in milliseconds
      * @param timeMilli Time in milliseconds
      * @return EventBuilder for chaining
@@ -208,9 +238,7 @@ public class EventBuilder {
     public EventBuilder timeWith(Event event){
         toBuild = new Event() {
             @Override
-            public void start() {
-
-            }
+            public void start() { }
 
             @Override
             public void update() {
@@ -230,33 +258,28 @@ public class EventBuilder {
         return this;
     }
 
-    /**
-     * Stops events until this event ends
-     * @param eventHandler The EventHandler to stop
-     * @return EventBuilder for chaining
-     */
-    public EventBuilder wait(EventHandler eventHandler){
+    public EventBuilder forever(){
         toBuild = new Event() {
+
             @Override
-            public void start() {
-                toBuild.start();
-            }
+            public void start() { }
 
             @Override
             public void update() {
-                eventHandler.setWait(true);
+                toBuild.update();
             }
 
             @Override
             public void end() {
-                eventHandler.setWait(false);
+                toBuild.end();
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return false;
             }
         };
         return this;
     }
+
 }
