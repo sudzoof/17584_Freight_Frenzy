@@ -258,6 +258,10 @@ public class EventBuilder {
         return this;
     }
 
+    /**
+     * Never ends the Event
+     * @return EventBuilder for chaining
+     */
     public EventBuilder forever(){
         toBuild = new Event() {
 
