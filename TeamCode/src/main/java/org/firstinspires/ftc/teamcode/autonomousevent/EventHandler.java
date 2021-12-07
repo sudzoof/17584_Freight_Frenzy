@@ -22,6 +22,11 @@ public class EventHandler {
         activeEvents = new ArrayList<>();
         wait = false;
     }
+    
+    public EventHandler(Event... events) {
+    	this();
+    	this.add(events);
+    }
 
     /**
      * Adds Events to the EventBuilder
@@ -35,7 +40,7 @@ public class EventHandler {
      * Updates the EventBuilder
      */
     public void update(){
-        while(!wait){
+        while(!wait && !readList.isEmpty()){
             Event e = readList.pop();
             activeEvents.add(e);
             e.start();

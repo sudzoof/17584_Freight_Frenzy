@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -19,11 +20,13 @@ public class DriverControl extends LinearOpMode{
         DcMotor rightDrive;
         DcMotor lift;
         DcMotor grabber;
+        CRServo servo;
 
         leftDrive = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         lift = hardwareMap.get(DcMotor.class, "lift");
         grabber = hardwareMap.get(DcMotor.class, "grabber");
+        servo = hardwareMap.get(CRServo.class, "servo");
 
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -49,6 +52,10 @@ public class DriverControl extends LinearOpMode{
             if(grabberOpen()) grabberPower = -grabberPower;
             if(grabberOpen() == grabberClose()) grabberPower = 0;
             grabber.setPower(grabberPower);
+
+            double servoPower = 0;
+            if(servoPower()) servoPower = 1;
+            servo.setPower(servoPower);
         }
     }
 
@@ -74,5 +81,9 @@ public class DriverControl extends LinearOpMode{
 
     private boolean grabberClose(){
         return gamepad1.left_bumper;
+    }
+
+    private boolean servoPower(){
+        return gamepad1.left_trigger > 0;
     }
 }

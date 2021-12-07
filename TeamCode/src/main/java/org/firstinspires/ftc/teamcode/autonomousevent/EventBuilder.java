@@ -209,7 +209,7 @@ public class EventBuilder {
             ElapsedTime timer = new ElapsedTime();
             @Override
             public void start() {
-                timer.startTime();
+                timer.reset();
             }
 
             @Override
