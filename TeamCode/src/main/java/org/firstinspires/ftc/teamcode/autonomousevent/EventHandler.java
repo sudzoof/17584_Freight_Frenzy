@@ -30,7 +30,7 @@ public class EventHandler {
     }
 
     /**
-     * Adds Events to the EventBuilder
+     * Adds Events to the EventHandler
      * @param events The event(s) to add
      */
     public void add(Event... events){
@@ -38,7 +38,7 @@ public class EventHandler {
     }
 
     /**
-     * Updates the EventBuilder
+     * Updates the EventHandler
      */
     public void update(){
         while(!wait && !readList.isEmpty()){
@@ -60,10 +60,18 @@ public class EventHandler {
         }
     }
 
+    /**
+     *
+     * @param wait Whether to stop reading the Event stack
+     */
     protected void setWait(boolean wait){
         this.wait = wait;
     }
 
+    /**
+     * Currently is not used
+     * @return Whether to stop reading the Event stack
+     */
     protected boolean getWait(){
         return wait;
      }
