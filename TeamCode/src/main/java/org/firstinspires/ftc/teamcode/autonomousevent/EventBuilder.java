@@ -7,13 +7,24 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * A custom builder for Events
  */
 public class EventBuilder {
+
     private Event toBuild;
+    private Event toChain;
 
     /**
      * Initializer
      */
     public EventBuilder(){
-
+        toBuild = new Event() {
+            @Override
+            public void start() { }
+            @Override
+            public void update() { }
+            @Override
+            public void end() { }
+            @Override
+            public boolean willEnd() { return false; }
+        };
     }
 
     /**
@@ -21,7 +32,7 @@ public class EventBuilder {
      * @param eb The EventBuilder to be chained
      */
     private EventBuilder(EventBuilder eb){
-        toBuild = eb.toBuild;
+        toBuild = eb.toChain;
     }
 
     /**
@@ -39,20 +50,22 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder powerMotor(DcMotorSimple motor, double power) {
-        toBuild = new Event() {
+        toChain = new Event() {
 
             @Override
             public void start() {
                 toBuild.start();
-            }
-
-            @Override
-            public void update() {
                 motor.setPower(power);
             }
 
             @Override
+            public void update() {
+                toBuild.update();
+            }
+
+            @Override
             public void end() {
+                toBuild.end();
                 motor.setPower(0);
             }
 
@@ -61,7 +74,7 @@ public class EventBuilder {
                 return toBuild.willEnd();
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -72,31 +85,33 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder driveStraight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
-        toBuild = new Event() {
+        toChain = new Event() {
 
             @Override
             public void start() {
                 toBuild.start();
-            }
-
-            @Override
-            public void update() {
                 leftDrive.setPower(power);
                 rightDrive.setPower(power);
             }
 
             @Override
+            public void update() {
+                toBuild.update();
+            }
+
+            @Override
             public void end() {
+                toBuild.end();
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return toChain.willEnd();
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -107,21 +122,23 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder turnLeft(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
-        toBuild = new Event() {
+        toChain = new Event() {
 
             @Override
             public void start() {
-                toBuild.start();
-            }
-
-            @Override
-            public void update() {
+                toBuild.update();
                 leftDrive.setPower(-power);
                 rightDrive.setPower(power);
             }
 
             @Override
+            public void update() {
+                toBuild.update();
+            }
+
+            @Override
             public void end() {
+                toBuild.end();
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
@@ -131,7 +148,7 @@ public class EventBuilder {
                 return toBuild.willEnd();
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -142,21 +159,23 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder turnRight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
-        toBuild = new Event() {
+        toChain = new Event() {
 
             @Override
             public void start() {
-                toBuild.start();
-            }
-
-            @Override
-            public void update() {
+                toBuild.update();
                 leftDrive.setPower(power);
                 rightDrive.setPower(-power);
             }
 
             @Override
+            public void update() {
+                toBuild.update();
+            }
+
+            @Override
             public void end() {
+                toBuild.end();
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
@@ -166,7 +185,7 @@ public class EventBuilder {
                 return toBuild.willEnd();
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -175,19 +194,21 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder wait(EventHandler eventHandler){
-        toBuild = new Event() {
+        toChain = new Event() {
             @Override
             public void start() {
                 toBuild.start();
-            }
-
-            @Override
-            public void update() {
                 eventHandler.setWait(true);
             }
 
             @Override
+            public void update() {
+                toBuild.update();
+            }
+
+            @Override
             public void end() {
+                toBuild.end();
                 eventHandler.setWait(false);
             }
 
@@ -196,7 +217,7 @@ public class EventBuilder {
                 return toBuild.willEnd();
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -205,10 +226,11 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder timerMilli(int timeMilli){
-        toBuild = new Event() {
+        toChain = new Event() {
             ElapsedTime timer = new ElapsedTime();
             @Override
             public void start() {
+                toBuild.start();
                 timer.reset();
             }
 
@@ -219,7 +241,7 @@ public class EventBuilder {
 
             @Override
             public void end() {
-                toBuild.update();
+                toBuild.end();
             }
 
             @Override
@@ -227,7 +249,7 @@ public class EventBuilder {
                 return timer.milliseconds() >= timeMilli;
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -236,9 +258,11 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder timeWith(Event event){
-        toBuild = new Event() {
+        toChain = new Event() {
             @Override
-            public void start() { }
+            public void start() {
+                toBuild.start();
+            }
 
             @Override
             public void update() {
@@ -247,7 +271,7 @@ public class EventBuilder {
 
             @Override
             public void end() {
-                toBuild.update();
+                toBuild.end();
             }
 
             @Override
@@ -255,7 +279,7 @@ public class EventBuilder {
                 return event.willEnd();
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
     /**
@@ -263,10 +287,12 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder forever(){
-        toBuild = new Event() {
+        toChain = new Event() {
 
             @Override
-            public void start() { }
+            public void start() {
+                toBuild.start();
+            }
 
             @Override
             public void update() {
@@ -283,7 +309,7 @@ public class EventBuilder {
                 return false;
             }
         };
-        return this;
+        return new EventBuilder(this);
     }
 
 }

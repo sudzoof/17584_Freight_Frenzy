@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomousevent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -45,13 +46,16 @@ public class EventHandler {
             activeEvents.add(e);
             e.start();
         }
-        for(Event e:activeEvents){
+
+        Iterator<Event> iterator = activeEvents.iterator();
+        while(iterator.hasNext()) {
+            Event e = iterator.next();
             if(!e.willEnd()){
                 e.update();
             }
             else{
                 e.end();
-                activeEvents.remove(e);
+                iterator.remove();
             }
         }
     }
