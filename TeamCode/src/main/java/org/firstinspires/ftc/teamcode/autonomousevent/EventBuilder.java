@@ -108,7 +108,7 @@ public class EventBuilder {
 
             @Override
             public boolean willEnd() {
-                return toChain.willEnd();
+                return toBuild.willEnd();
             }
         };
         return new EventBuilder(this);
