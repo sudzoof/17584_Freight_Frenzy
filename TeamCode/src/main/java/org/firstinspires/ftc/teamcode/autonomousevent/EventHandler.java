@@ -50,10 +50,8 @@ public class EventHandler {
         Iterator<Event> iterator = activeEvents.iterator();
         while(iterator.hasNext()) {
             Event e = iterator.next();
-            if(!e.willEnd()){
-                e.update();
-            }
-            else{
+            e.update();
+            if(e.willEnd()){
                 e.end();
                 iterator.remove();
             }
@@ -75,4 +73,12 @@ public class EventHandler {
     protected boolean getWait(){
         return wait;
      }
+
+    /**
+     *
+     * @return Whether all the events have been read and run
+     */
+    public boolean isDone() {
+        return readList.isEmpty() && activeEvents.isEmpty();
+    }
 }

@@ -3,19 +3,22 @@ package org.firstinspires.ftc.teamcode.autonomousevent;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.Stack;
+
 /**
  * A custom builder for Events
  */
 public class EventBuilder {
 
-    private Event toBuild;
-    private Event toChain;
+    private Stack<Event> storage;
+
 
     /**
      * Initializer
      */
     public EventBuilder(){
-        toBuild = new Event() {
+        storage = new Stack<>();
+        storage.push( new Event() {
             @Override
             public void start() { }
             @Override
@@ -24,15 +27,7 @@ public class EventBuilder {
             public void end() { }
             @Override
             public boolean willEnd() { return false; }
-        };
-    }
-
-    /**
-     * Initializer for chaining
-     * @param eb The EventBuilder to be chained
-     */
-    private EventBuilder(EventBuilder eb){
-        toBuild = eb.toChain;
+        });
     }
 
     /**
@@ -40,7 +35,7 @@ public class EventBuilder {
      * @return The Event that is built
      */
     public Event build(){
-        return toBuild;
+        return storage.peek();
     }
 
     /**
@@ -50,31 +45,32 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder powerMotor(DcMotorSimple motor, double power) {
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
 
             @Override
             public void start() {
-                toBuild.start();
+                prevEvent.start();
                 motor.setPower(power);
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
                 motor.setPower(0);
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return prevEvent.willEnd();
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -85,33 +81,34 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder driveStraight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
 
             @Override
             public void start() {
-                toBuild.start();
+                prevEvent.start();
                 leftDrive.setPower(power);
                 rightDrive.setPower(power);
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return prevEvent.willEnd();
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -122,33 +119,34 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder turnLeft(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
 
             @Override
             public void start() {
-                toBuild.update();
+                prevEvent.update();
                 leftDrive.setPower(-power);
                 rightDrive.setPower(power);
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return prevEvent.willEnd();
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -159,33 +157,34 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder turnRight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
 
             @Override
             public void start() {
-                toBuild.update();
+                prevEvent.update();
                 leftDrive.setPower(power);
                 rightDrive.setPower(-power);
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return prevEvent.willEnd();
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -194,30 +193,32 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder wait(EventHandler eventHandler){
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
+
             @Override
             public void start() {
-                toBuild.start();
+                prevEvent.start();
                 eventHandler.setWait(true);
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
                 eventHandler.setWait(false);
             }
 
             @Override
             public boolean willEnd() {
-                return toBuild.willEnd();
+                return prevEvent.willEnd();
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -225,31 +226,36 @@ public class EventBuilder {
      * @param timeMilli Time in milliseconds
      * @return EventBuilder for chaining
      */
-    public EventBuilder timerMilli(int timeMilli){
-        toChain = new Event() {
+    public EventBuilder timerMilli(double timeMilli){
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
+
             ElapsedTime timer = new ElapsedTime();
+            double currentTime = 0;
+
             @Override
             public void start() {
-                toBuild.start();
+                prevEvent.start();
                 timer.reset();
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
+                currentTime = timer.milliseconds();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
             }
 
             @Override
             public boolean willEnd() {
-                return timer.milliseconds() >= timeMilli;
+                return currentTime >= timeMilli;
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -258,28 +264,30 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder timeWith(Event event){
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
+
             @Override
             public void start() {
-                toBuild.start();
+                prevEvent.start();
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
             }
 
             @Override
             public boolean willEnd() {
                 return event.willEnd();
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
     /**
@@ -287,29 +295,30 @@ public class EventBuilder {
      * @return EventBuilder for chaining
      */
     public EventBuilder forever(){
-        toChain = new Event() {
+        storage.push( new Event() {
+            Event prevEvent = storage.peek();
 
             @Override
             public void start() {
-                toBuild.start();
+                prevEvent.start();
             }
 
             @Override
             public void update() {
-                toBuild.update();
+                prevEvent.update();
             }
 
             @Override
             public void end() {
-                toBuild.end();
+                prevEvent.end();
             }
 
             @Override
             public boolean willEnd() {
                 return false;
             }
-        };
-        return new EventBuilder(this);
+        });
+        return this;
     }
 
 }
