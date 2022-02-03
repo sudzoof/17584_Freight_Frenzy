@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.gamecode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="Driver Control", group="Linear Opmode")
 
-public class DriverControl extends LinearOpMode{
+public class DriverControl extends MyOpMode{
 
     @Override
     public void runOpMode(){
@@ -16,46 +12,29 @@ public class DriverControl extends LinearOpMode{
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        DcMotor leftDrive;
-        DcMotor rightDrive;
-        DcMotor lift;
-        DcMotor grabber;
-        CRServo servo;
-
-        leftDrive = hardwareMap.get(DcMotor.class, "leftDrive");
-        rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        grabber = hardwareMap.get(DcMotor.class, "grabber");
-        servo = hardwareMap.get(CRServo.class, "servo");
-
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
-        lift.setDirection(DcMotor.Direction.FORWARD);
-        grabber.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        grabber.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        controlSetup();
 
         waitForStart();
 
         while (opModeIsActive()){
 
-            leftDrive.setPower(leftPower());
-            rightDrive.setPower(rightPower());
+            getLeftDrive().setPower(leftPower());
+            getRightDrive().setPower(rightPower());
 
             double liftPower = .55;
             if(liftDownValue()) liftPower = -liftPower;
             if(liftUpValue() == liftDownValue()) liftPower = 0;
-            lift.setPower(liftPower);
+            getLift().setPower(liftPower);
 
             double grabberPower = .70;
-            if(grabberOpen()) grabberPower = -grabberPower;
+            if(grabberClose()) grabberPower = -grabberPower;
             if(grabberOpen() == grabberClose()) grabberPower = 0;
-            grabber.setPower(grabberPower);
+            getGrabber().setPower(grabberPower);
 
-            double servoPower = 0;
-            if(servoPower()) servoPower = 1;
-            servo.setPower(servoPower);
+            double servoPower = 1;
+            if(servoLeft()) servoPower = -servoPower;
+            if(servoLeft() == servoRight()) servoPower = 0;
+            getServo().setPower(servoPower);
         }
     }
 
@@ -76,14 +55,18 @@ public class DriverControl extends LinearOpMode{
     }
 
     private boolean grabberOpen(){
-        return gamepad1.right_bumper;
-    }
-
-    private boolean grabberClose(){
         return gamepad1.left_bumper;
     }
 
-    private boolean servoPower(){
+    private boolean grabberClose(){
+        return gamepad1.right_bumper;
+    }
+
+    private boolean servoLeft(){
         return gamepad1.left_trigger > 0;
+    }
+
+    private boolean servoRight(){
+        return gamepad1.right_trigger > 0;
     }
 }
