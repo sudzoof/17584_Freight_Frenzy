@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomousevent;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,7 +11,7 @@ import java.util.Stack;
  */
 public class EventBuilder {
 
-    private Stack<Event> storage;
+    final private Stack<Event> storage;
 
 
     /**
@@ -46,7 +47,7 @@ public class EventBuilder {
      */
     public EventBuilder powerMotor(DcMotorSimple motor, double power) {
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
@@ -82,7 +83,7 @@ public class EventBuilder {
      */
     public EventBuilder driveStraight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
@@ -111,6 +112,35 @@ public class EventBuilder {
         return this;
     }
 
+    public EventBuilder driveStraight(DriveTrain drive, double power){
+        storage.push( new Event() {
+            final Event prevEvent = storage.peek();
+
+            @Override
+            public void start() {
+                prevEvent.start();
+                drive.driveStraight(power);
+            }
+
+            @Override
+            public void update() {
+                prevEvent.update();
+            }
+
+            @Override
+            public void end() {
+                prevEvent.end();
+                drive.stop();
+            }
+
+            @Override
+            public boolean willEnd() {
+                return prevEvent.willEnd();
+            }
+        });
+        return this;
+    }
+
     /**
      * Powers a drivetrain to turn left
      * @param leftDrive Left drive motor
@@ -120,7 +150,7 @@ public class EventBuilder {
      */
     public EventBuilder turnLeft(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
@@ -149,6 +179,35 @@ public class EventBuilder {
         return this;
     }
 
+    public EventBuilder turnLeft(DriveTrain drive, double power){
+        storage.push( new Event() {
+            final Event prevEvent = storage.peek();
+
+            @Override
+            public void start() {
+                prevEvent.start();
+                drive.turnLeft(power);
+            }
+
+            @Override
+            public void update() {
+                prevEvent.update();
+            }
+
+            @Override
+            public void end() {
+                prevEvent.end();
+                drive.stop();
+            }
+
+            @Override
+            public boolean willEnd() {
+                return prevEvent.willEnd();
+            }
+        });
+        return this;
+    }
+
     /**
      * Powers a drivetrain to turn right
      * @param leftDrive Left drive motor
@@ -158,7 +217,7 @@ public class EventBuilder {
      */
     public EventBuilder turnRight(DcMotorSimple leftDrive, DcMotorSimple rightDrive, double power){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
@@ -187,6 +246,35 @@ public class EventBuilder {
         return this;
     }
 
+    public EventBuilder turnRight(DriveTrain drive, double power){
+        storage.push( new Event() {
+            final Event prevEvent = storage.peek();
+
+            @Override
+            public void start() {
+                prevEvent.start();
+                drive.turnRight(power);
+            }
+
+            @Override
+            public void update() {
+                prevEvent.update();
+            }
+
+            @Override
+            public void end() {
+                prevEvent.end();
+                drive.stop();
+            }
+
+            @Override
+            public boolean willEnd() {
+                return prevEvent.willEnd();
+            }
+        });
+        return this;
+    }
+
     /**
      * Stops events until this event ends
      * @param eventHandler The EventHandler to stop
@@ -194,7 +282,7 @@ public class EventBuilder {
      */
     public EventBuilder wait(EventHandler eventHandler){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
@@ -228,9 +316,9 @@ public class EventBuilder {
      */
     public EventBuilder timerMilli(double timeMilli){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
-            ElapsedTime timer = new ElapsedTime();
+            final ElapsedTime timer = new ElapsedTime();
             double currentTime = 0;
 
             @Override
@@ -265,7 +353,7 @@ public class EventBuilder {
      */
     public EventBuilder timeWith(Event event){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
@@ -290,13 +378,46 @@ public class EventBuilder {
         return this;
     }
 
+    public EventBuilder timeWithMotorEncoder(DcMotor motor, double degree) {
+        storage.push( new Event() {
+            final Event prevEvent = storage.peek();
+
+            double startPosition = 0;
+            double currentPosition = 0;
+
+            @Override
+            public void start() {
+                prevEvent.start();
+                startPosition = motor.getCurrentPosition();
+            }
+
+            @Override
+            public void update() {
+                prevEvent.update();
+                currentPosition = motor.getCurrentPosition() - startPosition;
+            }
+
+            @Override
+            public void end() {
+                prevEvent.end();
+            }
+
+            @Override
+            public boolean willEnd() {
+                return (degree >= 0 && currentPosition >= degree)||(degree < 0 && currentPosition <= degree);
+            }
+        });
+        return this;
+    }
+
+
     /**
      * Never ends the Event
      * @return EventBuilder for chaining
      */
     public EventBuilder forever(){
         storage.push( new Event() {
-            Event prevEvent = storage.peek();
+            final Event prevEvent = storage.peek();
 
             @Override
             public void start() {
